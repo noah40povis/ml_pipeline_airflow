@@ -17,6 +17,7 @@ from airflow import settings
 import pandas as pd
 import sqlite3
 import os
+import logging
 
 # [START default_args]
 default_args = {
@@ -61,6 +62,7 @@ def load_data():
     """Load the csv data into tables `search_request` and 
     `search_result_interaction` in the default db.
     """    
+    logging.info('****** NOAH starting load data')
     # reuse the same sqlite db as airflow
     con = sqlite3.connect(db_filepath)
     
@@ -72,6 +74,7 @@ def load_data():
             df.to_sql(table, con, if_exists='replace', index=False)
         else:
             raise Exception(f'{filename} does not exist')
+    logging.info('****** NOAH 2 ending load data')
 
 load_data = PythonOperator(
     task_id='load_data',
@@ -89,6 +92,9 @@ for table in tables:
         select count(*)
         from {table}
     """
+
+    logging.info(f'****** NOAH processing {table}')
+
     read_data = SqliteOperator(
         task_id=f'read_data_{table}',
         sqlite_conn_id=os.getenv('CONN_ID'),
@@ -102,7 +108,10 @@ Demonstrates how to access the tables populated in `load_data` with pandas.
 If you used pandas to load/modify data, you can work off of this example.
 Hmm doesn't seem super efficient. 
 """
+logging.info('****** NOAH finish reading data')
+
 def clean_data_df(tablename: str):
+    logging.info(f'***** NOAH starting clean data {tablename}')
     db_con_str = os.getenv('AIRFLOW__CORE__SQL_ALCHEMY_CONN')
     con = sqlite3.connect(db_filepath)
     df = pd.read_sql(f"select * from {tablename}", con)
@@ -110,7 +119,8 @@ def clean_data_df(tablename: str):
     # Drop "Unnamed" columns
     junk_columns = df.columns[df.columns.str.startswith('Unnamed')]
     df = df.drop(junk_columns, axis=1)
-    
+    logging.info(f'****** NOAH just dropped {len(junk_columns)} columns from {tablename}')
+
     for count, value in enumerate(df['ts']):
         if value[27:28] == '0':
             x = value[:19]
@@ -118,25 +128,14 @@ def clean_data_df(tablename: str):
             z = y[:3] + ':' + y[3:]
             cleaned = x + z
             df['ts'][count] = cleaned
-            df['ts'] = pd.to_datetime(search_request['ts'], utc=True)
-            total = df2.merge(df, on="search_id", how="left", copy=False)
-
+            df['ts'] = pd.to_datetime(df['ts'], utc=True)
+    logging.info(f'****** NOAH finished cleaning timestamp')
+   
     # Replace the table with a cleaned version
-    
-
     df.to_sql(f'clean_{tablename}', con, if_exists='replace', index=False)
     
-    try:
-        df1 = pd.read_sql(f"select * from clean_search_result_interaction", con)
-        df2 = pd.read_sql(f"select * from clean_search_request", con1)
-        total = df1.merge(df2, on="search_id", how="left", copy=False)
-        total = total.dropna()
-        search_result_interaction = pd.DataFrame(total, columns = ['search_id', 'ts_x', 'cid', 'position'])
-        search_result_interaction = search_result_interaction.rename(columns={'ts_x':'ts'})
-        search_result_interaction.to_sql(f'clean_search_result_interaction', con, if_exists='replace', index=False)
-    except:
-        pass
     
+logging.debug('******NOAH  Run clean data')
 
 for table in tables:
     clean_data = PythonOperator(
@@ -148,6 +147,23 @@ for table in tables:
         dag=dag,
     )
     load_data >> clean_data
+
+def merge_data():
+    con = sqlite3.connect(db_filepath)
+    df1 = pd.read_sql(f"select * from clean_search_result_interaction", con)
+    df2 = pd.read_sql(f"select * from clean_search_request", con)
+    total = df1.merge(df2, on="search_id", how="left", copy=False)
+    total = total.dropna()
+    merged_search_result = pd.DataFrame(total, columns = ['search_id', 'ts_x', 'cid', 'position'])
+    merged_search_result = merged_search_result.rename(columns={'ts_x':'ts'})
+    merged_search_result.to_sql(f'merged_search_results', con, if_exists='replace', index=False)
+
+merge_data = PythonOperator(
+        task_id= 'merge_data',
+        python_callable= merge_data,
+        dag=dag,
+    )
+clean_data >> merge_data
 
 # [START documentation]
 

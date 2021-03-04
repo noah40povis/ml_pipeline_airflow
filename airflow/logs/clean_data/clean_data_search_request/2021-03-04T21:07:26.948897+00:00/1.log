@@ -1,0 +1,32 @@
+[2021-03-04 21:08:00,653] {taskinstance.py:670} INFO - Dependencies all met for <TaskInstance: clean_data.clean_data_search_request 2021-03-04T21:07:26.948897+00:00 [queued]>
+[2021-03-04 21:08:00,687] {taskinstance.py:670} INFO - Dependencies all met for <TaskInstance: clean_data.clean_data_search_request 2021-03-04T21:07:26.948897+00:00 [queued]>
+[2021-03-04 21:08:00,687] {taskinstance.py:880} INFO - 
+--------------------------------------------------------------------------------
+[2021-03-04 21:08:00,688] {taskinstance.py:881} INFO - Starting attempt 1 of 2
+[2021-03-04 21:08:00,688] {taskinstance.py:882} INFO - 
+--------------------------------------------------------------------------------
+[2021-03-04 21:08:00,723] {taskinstance.py:901} INFO - Executing <Task(PythonOperator): clean_data_search_request> on 2021-03-04T21:07:26.948897+00:00
+[2021-03-04 21:08:00,729] {standard_task_runner.py:54} INFO - Started process 6147 to run task
+[2021-03-04 21:08:00,767] {standard_task_runner.py:77} INFO - Running: ['airflow', 'run', 'clean_data', 'clean_data_search_request', '2021-03-04T21:07:26.948897+00:00', '--job_id', '63', '--pool', 'default_pool', '--raw', '-sd', 'DAGS_FOLDER/data_clean.py', '--cfg_path', '/tmp/tmpnqbey1lw']
+[2021-03-04 21:08:00,771] {standard_task_runner.py:78} INFO - Job 63: Subtask clean_data_search_request
+[2021-03-04 21:08:00,930] {logging_mixin.py:112} INFO - Running %s on host %s <TaskInstance: clean_data.clean_data_search_request 2021-03-04T21:07:26.948897+00:00 [running]> 6623e80cd770
+[2021-03-04 21:08:01,002] {data_clean.py:114} INFO - ***** NOAH starting clean data search_request
+[2021-03-04 21:08:01,061] {data_clean.py:122} INFO - ****** NOAH just dropped 1 columns from search_request
+[2021-03-04 21:08:01,072] {logging_mixin.py:112} WARNING - /opt/airflow/dags/data_clean.py:130: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df['ts'][count] = cleaned
+[2021-03-04 21:08:01,073] {taskinstance.py:1150} ERROR - name 'search_request' is not defined
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 984, in _run_raw_task
+    result = task_copy.execute(context=context)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/operators/python_operator.py", line 113, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/operators/python_operator.py", line 118, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/data_clean.py", line 131, in clean_data_df
+    df['ts'] = pd.to_datetime(search_request['ts'], utc=True)
+NameError: name 'search_request' is not defined
+[2021-03-04 21:08:01,077] {taskinstance.py:1194} INFO - Marking task as UP_FOR_RETRY. dag_id=clean_data, task_id=clean_data_search_request, execution_date=20210304T210726, start_date=20210304T210800, end_date=20210304T210801
+[2021-03-04 21:08:05,704] {local_task_job.py:102} INFO - Task exited with return code 1
