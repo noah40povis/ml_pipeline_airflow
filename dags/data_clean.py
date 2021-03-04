@@ -111,9 +111,33 @@ def clean_data_df(tablename: str):
     junk_columns = df.columns[df.columns.str.startswith('Unnamed')]
     df = df.drop(junk_columns, axis=1)
     
+    for count, value in enumerate(df['ts']):
+        if value[27:28] == '0':
+            x = value[:19]
+            y = value[24:]
+            z = y[:3] + ':' + y[3:]
+            cleaned = x + z
+            df['ts'][count] = cleaned
+            df['ts'] = pd.to_datetime(search_request['ts'], utc=True)
+            total = df2.merge(df, on="search_id", how="left", copy=False)
+
     # Replace the table with a cleaned version
+    
+
     df.to_sql(f'clean_{tablename}', con, if_exists='replace', index=False)
-        
+    
+    try:
+        df1 = pd.read_sql(f"select * from clean_search_result_interaction", con)
+        df2 = pd.read_sql(f"select * from clean_search_request", con1)
+        total = df1.merge(df2, on="search_id", how="left", copy=False)
+        total = total.dropna()
+        search_result_interaction = pd.DataFrame(total, columns = ['search_id', 'ts_x', 'cid', 'position'])
+        search_result_interaction = search_result_interaction.rename(columns={'ts_x':'ts'})
+        search_result_interaction.to_sql(f'clean_search_result_interaction', con, if_exists='replace', index=False)
+    except:
+        pass
+    
+
 for table in tables:
     clean_data = PythonOperator(
         task_id=f'clean_data_{table}',
