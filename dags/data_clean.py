@@ -156,7 +156,11 @@ def merge_data():
     total = total.dropna()
     merged_search_result = pd.DataFrame(total, columns = ['search_id', 'ts_x', 'cid', 'position'])
     merged_search_result = merged_search_result.rename(columns={'ts_x':'ts'})
+    merged_search_request = pd.DataFrame(total, columns = ['search_id', 'ts_y','cuid', 'total'])
+    merged_search_request = merged_search_request.rename(columns={'ts_y':'ts'})
+    merged_search_request.to_sql(f'merged_search_request', con, if_exists='replace', index=False)
     merged_search_result.to_sql(f'merged_search_results', con, if_exists='replace', index=False)
+
 
 merge_data = PythonOperator(
         task_id= 'merge_data',

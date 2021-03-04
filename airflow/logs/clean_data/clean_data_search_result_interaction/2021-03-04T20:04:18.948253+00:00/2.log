@@ -28,3 +28,31 @@ Traceback (most recent call last):
 NameError: name 'search_request' is not defined
 [2021-03-04 20:10:03,091] {taskinstance.py:1194} INFO - Marking task as FAILED. dag_id=clean_data, task_id=clean_data_search_result_interaction, execution_date=20210304T200418, start_date=20210304T201002, end_date=20210304T201003
 [2021-03-04 20:10:07,875] {local_task_job.py:102} INFO - Task exited with return code 1
+[2021-03-04 22:34:25,131] {taskinstance.py:670} INFO - Dependencies all met for <TaskInstance: clean_data.clean_data_search_result_interaction 2021-03-04T20:04:18.948253+00:00 [queued]>
+[2021-03-04 22:34:25,173] {taskinstance.py:670} INFO - Dependencies all met for <TaskInstance: clean_data.clean_data_search_result_interaction 2021-03-04T20:04:18.948253+00:00 [queued]>
+[2021-03-04 22:34:25,174] {taskinstance.py:880} INFO - 
+--------------------------------------------------------------------------------
+[2021-03-04 22:34:25,174] {taskinstance.py:881} INFO - Starting attempt 2 of 2
+[2021-03-04 22:34:25,174] {taskinstance.py:882} INFO - 
+--------------------------------------------------------------------------------
+[2021-03-04 22:34:25,213] {taskinstance.py:901} INFO - Executing <Task(PythonOperator): clean_data_search_result_interaction> on 2021-03-04T20:04:18.948253+00:00
+[2021-03-04 22:34:25,217] {standard_task_runner.py:54} INFO - Started process 28 to run task
+[2021-03-04 22:34:25,253] {standard_task_runner.py:77} INFO - Running: ['airflow', 'run', 'clean_data', 'clean_data_search_result_interaction', '2021-03-04T20:04:18.948253+00:00', '--job_id', '34', '--pool', 'default_pool', '--raw', '-sd', 'DAGS_FOLDER/data_clean.py', '--cfg_path', '/tmp/tmpi9cc7afu']
+[2021-03-04 22:34:25,258] {standard_task_runner.py:78} INFO - Job 34: Subtask clean_data_search_result_interaction
+[2021-03-04 22:34:25,350] {logging_mixin.py:112} INFO - Running %s on host %s <TaskInstance: clean_data.clean_data_search_result_interaction 2021-03-04T20:04:18.948253+00:00 [running]> 6623e80cd770
+[2021-03-04 22:34:25,391] {data_clean.py:114} INFO - ***** NOAH starting clean data search_result_interaction
+[2021-03-04 22:34:25,414] {data_clean.py:122} INFO - ****** NOAH just dropped 1 columns from search_result_interaction
+[2021-03-04 22:34:25,419] {logging_mixin.py:112} WARNING - /opt/airflow/dags/data_clean.py:130: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df['ts'][count] = cleaned
+[2021-03-04 22:34:25,447] {logging_mixin.py:112} WARNING - /home/airflow/.local/lib/python3.6/site-packages/pandas/core/indexing.py:670: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  iloc._setitem_with_indexer(indexer, value)
+[2021-03-04 22:34:56,276] {data_clean.py:132} INFO - ****** NOAH finished cleaning timestamp
+[2021-03-04 22:34:56,365] {python_operator.py:114} INFO - Done. Returned value was: None
+[2021-03-04 22:34:56,374] {taskinstance.py:1070} INFO - Marking task as SUCCESS.dag_id=clean_data, task_id=clean_data_search_result_interaction, execution_date=20210304T200418, start_date=20210304T223425, end_date=20210304T223456
+[2021-03-04 22:35:00,173] {local_task_job.py:102} INFO - Task exited with return code 0
