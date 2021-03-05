@@ -177,12 +177,25 @@ an environment variable DATA_DIR) into the database Airflow creates.
 
 read_data.doc_md = """\
 #### Read Data 
-This task does nothing. It demonstrates how to use the SQLite operator.
+This reads the data into the pipeline. 
 """
 
 clean_data.doc_md =  """\ 
 #### Clean Data 
-This task removes a column with pandas. It demonstrates how to alter data 
-and write it back into the same table.
-[END documentation]
+This task removes a column with pandas and converts the timestamp columns ('ts') to proper formating and UTC. 
 """ 
+
+merge_data.doc_md = """\
+#### Merge Data 
+This task merges the two dataframes in order to remove the rows that contain null values, so that all 
+click data should have a corresponding search requests. 
+"""
+
+proposal.doc_md = """\
+#### Proposal 
+
+- By taking the "cuid", you could create a profile for each user
+that utilizes the position of the result they clicked on, the cid, and the query
+to build a model that can provide the user with recommendations based on their past experiences. 
+
+"""
